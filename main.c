@@ -129,17 +129,17 @@ int main() {
       // ** WRITE TO FILE "saved-logs.txt"
       FILE *pFile = fopen("saved-logs.txt", "w");
 
-      for (int i = 0; i < logCount; i++)
-      {
-        fprintf(pFile, "ID: %d\nTYPE: %s\nVALUE: %.2f\nTIMESTAMP: %s\n", logs[i].id, sensorNames[logs[i].type], logs[i].value, logs[i].timestamp);
-      }
-
       // * CHECK FOR ERROR
       if (pFile == NULL) {
         printf("Error opening file\n");
         return 1;
       }
       // *
+
+      for (int i = 0; i < logCount; i++)
+      {
+        fprintf(pFile, "ID: %d\nTYPE: %s\nVALUE: %.2f\nTIMESTAMP: %s\n", logs[i].id, sensorNames[logs[i].type], logs[i].value, logs[i].timestamp);
+      }
 
       fclose(pFile);
       // **
@@ -221,6 +221,7 @@ int main() {
   } while (userChoice != 5);
 
 
+  free(logs);
   return 0;
 }
 
