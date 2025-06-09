@@ -11,34 +11,34 @@
 //                    (TEMP, PRESSURE, LIGHT, ETC.)
 
 void getTimeAndDate();
-void checkCapacity();
+int checkLogCountCapacity();
+
+typedef enum {
+  TEMP_SENSOR,
+  PRESSURE_SENSOR,
+  LIGHT_SENSOR,
+  HUMIDITY_SENSOR,
+  PROXIMITY_SENSOR,
+  GAS_SENSOR,
+  NUM_SENSOR_TYPES
+} sensorType;
+const char *sensorNames[] = {
+  "Temperature Sensor",
+  "Pressure Sensor",
+  "Light Sensor",
+  "Humidity Sensor",
+  "Proximity Sensor",
+  "Gas Sensor",
+};
+typedef struct {
+  int id;
+  sensorType type;
+  float value;
+  char timestamp[20];
+} sensorLog;
 
 int main() {
-
   // INITIALIZATION
-  typedef enum {
-    TEMP_SENSOR,
-    PRESSURE_SENSOR,
-    LIGHT_SENSOR,
-    HUMIDITY_SENSOR,
-    PROXIMITY_SENSOR,
-    GAS_SENSOR,
-    NUM_SENSOR_TYPES
-  } sensorType;
-  const char *sensorNames[] = {
-    "Temperature Sensor",
-    "Pressure Sensor",
-    "Light Sensor",
-    "Humidity Sensor",
-    "Proximity Sensor",
-    "Gas Sensor",
-  };
-  typedef struct {
-    int id;
-    sensorType type;
-    float value;
-    char timestamp[20];
-  } sensorLog;
   char menuOptions[][25] = {
     "1. Add new sensor log",
     "2. View sensor logs",
@@ -62,8 +62,10 @@ int main() {
   }
   // **
 
+
   do
   {
+    // ** SYSTEM  : INTRODUCTION & MENU
     printf("\nSIMULATED MODULAR DIGITAL SENSOR LOGGER\n");
     for (int i = 0; i < sizeof(menuOptions) / sizeof(menuOptions[0]);i++) {
       printf("%s\n", menuOptions[i]);
@@ -92,7 +94,6 @@ int main() {
       // **
 
       // ** RANDOM ID
-      // srand(time(NULL));
       int logID = (rand() % 10000) + 1;
       newLog.id = logID;
       // **
@@ -195,13 +196,12 @@ int main() {
         sscanf(valueBuffer, "VALUE: %f", &value);
         sscanf(timestampBuffer, "TIMESTAMP: %[^\n]", timestamp);
 
-        // printf("%d", count);
         printf("\nID: %d\nTYPE: %s\nVALUE: %.2f\nTIMESTAMP: %s\n", id, type, value, timestamp);
 
         sensorLog newLog;
         newLog.id = id;
         for (int i = 0;i < NUM_SENSOR_TYPES;i++) {
-          if (type == sensorNames[i]) {
+          if (strcmp(type, sensorNames[i]) == 0) {
             newLog.type = i;
             break;
           }
@@ -211,7 +211,7 @@ int main() {
         logs[logCount] = newLog;
 
         count++;
-        logCount = count;
+        logCount++;
 
         // ** CHECK LOG COUNT AND LOG CAPACITY
         if (logCount >= logsCapacity) {
@@ -226,10 +226,6 @@ int main() {
           // **
         }
         // **
-
-
-
-
       }
 
 
@@ -245,6 +241,22 @@ int main() {
   return 0;
 }
 
+int checkLogCountCapacity(int logCount, int *logsCapacity, sensorLog **logs) {
+  // ** CHECK LOG COUNT AND LOG CAPACITY
+  if (logCount >= *logsCapacity) {
+    printf("\nLog capacity has been reached!\nMemory expanded!\n");
+    *logsCapacity *= 2;
+    *logs = realloc(*logs, *logsCapacity * sizeof(sensorLog));
+    // ** CHECK FOR MEMORY ALLOCATION FAILURE
+    if (*logs == NULL) {
+      printf("Memory allocation failed!\n");
+      return 1;
+    }
+    // **
+  }
+  // **
+};
+
 void getTimeAndDate(char *buffer) {
   // **INITIALIZATION TIME
   time_t rawtime = 0; // Jan 1 1970 (Epoch)
@@ -254,13 +266,12 @@ void getTimeAndDate(char *buffer) {
   pTime = localtime(&rawtime);
   // **
 
-
-  // ** GETTING TIME
-  // printf("%02d:%02d:%02d\n", pTime->tm_hour, pTime->tm_min, pTime->tm_sec);
-  // ** GETTING DATE
-  // printf("%02d-%02d-%02d", pTime->tm_mday, (pTime->tm_mon) + 1, (pTime->tm_year) + 1900);
-  // **
-
-
-  sprintf(buffer, "%02d-%02d-%02d %02d:%02d:%02d", pTime->tm_mday, (pTime->tm_mon) + 1, (pTime->tm_year) + 1900, pTime->tm_hour, pTime->tm_min, pTime->tm_sec);
+  sprintf(buffer,
+    "%02d-%02d-%02d %02d:%02d:%02d",
+    pTime->tm_mday,
+    (pTime->tm_mon) + 1,
+    (pTime->tm_year) + 1900,
+    pTime->tm_hour,
+    pTime->tm_min,
+    pTime->tm_sec);
 };
