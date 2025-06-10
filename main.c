@@ -9,6 +9,8 @@
 //  DATE          :   09/06/25
 //  DESCRIPTION   :   SIMULATES READING DATA FROM DIFFERENT DIGITAL SENSORS 
 //                    (TEMP, PRESSURE, LIGHT, ETC.)
+// TIME TAKEN     :   5HR 45MIN
+// TO COMPLETE
 
 // ** FUNCTION PROTOTYPES
 void getTimeAndDate();
